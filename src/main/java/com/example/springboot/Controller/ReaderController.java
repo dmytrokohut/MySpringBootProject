@@ -28,7 +28,7 @@ public class ReaderController {
 	 * Get information about all readers
 	 * @return
 	 */
-	@RequestMapping(path="/all", method=RequestMethod.GET)
+	@RequestMapping(value="/all", method=RequestMethod.GET)
 	public Collection<Reader> findAllReaders(){
 		return readerDAO.findAllReaders();
 	}
@@ -39,14 +39,13 @@ public class ReaderController {
 	 * @return
 	 */
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
-	public Reader readById(@PathVariable("id") int id) {
-		return readerDAO.readById(id);
+	public Reader selectById(@PathVariable("id") int id) {
+		return readerDAO.selectById(id);
 	}
 	
 	/**
 	 * Create a new reader in database
-	 * @param name
-	 * @param email
+	 * @param book
 	 * @return
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
@@ -56,10 +55,8 @@ public class ReaderController {
 	}
 	
 	/**
-	 * Update information about reader by given id
-	 * @param id
-	 * @param name
-	 * @param email
+	 * Update information about reader
+	 * @param book
 	 * @return
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
@@ -74,8 +71,8 @@ public class ReaderController {
 	 * @return
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public String removeReader(@PathVariable("id") int id) {
-		readerDAO.removeById(id);
+	public String deleteReader(@PathVariable("id") int id) {
+		readerDAO.deleteById(id);
 		return "Reader with id=" + id + " was removed from database";
 	}
 }

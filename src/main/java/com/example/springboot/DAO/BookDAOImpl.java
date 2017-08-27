@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -13,17 +12,18 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import com.example.springboot.Base.Reader;
+import com.example.springboot.Base.Book;
+import com.mysql.jdbc.Statement;
 
 /**
- * This class implement methods from ReaderDAO interface. Repository annotation more suitable to DAO than Component
+ * This class implement methods from BookDAO interface. Repository annotation more suitable to DAO than Component
  * @author Dmytro Kohut
  * @version 1.0
  */
-@Repository("readerDAO")
-public class ReaderDAOImpl implements ReaderDAO{
+@Repository("bookDAO")
+public class BookDAOImpl implements BookDAO {
 	
-	final static Logger LOGGER = Logger.getLogger(ReaderDAOImpl.class);
+	final static Logger LOGGER = Logger.getLogger(BookDAOImpl.class);
 	
 	static {
 		try {
@@ -34,46 +34,45 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * This method create and return a connection for database access
+	 * This method create and return a connection
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	private Connection getConnection() throws SQLException {
 		return DriverManager.getConnection("jdbc:mysql://localhost:3306/libriary", "root", "root");
 	}
 	
 	/**
-	 * This method close a given connection
+	 * This method close an given connection
 	 * @param connection
 	 */
 	private void closeConnection(Connection connection) {
 		try {
 			connection.close();
 		} catch(SQLException e) {
-			LOGGER.error("Cannot close the connection", e);
+			LOGGER.error("ERROR ", e);
 		}
-		
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#findAllReaders()
+	 * @see com.example.springboot.DAO.BookDAO#findAllBooks()
 	 */
 	@Override
-	public Collection<Reader> findAllReaders(){
+	public Collection<Book> findAllBooks() {
 		Connection connection = null;
-		List<Reader> resultList = new ArrayList<>();
+		List<Book> resultList = new ArrayList<>();
 		
 		try {
 			connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM `readers`;");
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM `books`;");
 			ResultSet resultSet = statement.executeQuery();
 			
 			while(resultSet.next()) {
-				Reader reader = new Reader(resultSet.getInt("id"), 
-						resultSet.getString("name"), resultSet.getString("email"));
-				resultList.add(reader);
+				Book book = new Book(resultSet.getInt("id"), resultSet.getString("title"),
+						resultSet.getString("author"), resultSet.getInt("reader_id"));
+				resultList.add(book);
 			}
-		} catch(SQLException e) {
+		} catch(SQLException | NullPointerException e) {
 			LOGGER.error("ERROR ", e);
 		} finally {
 			closeConnection(connection);
@@ -83,23 +82,24 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#createReader(Reader reader)
+	 * @see com.example.springboot.DAO.BookDAO#createBook(Book book)
 	 */
 	@Override
-	public void createReader(Reader reader) {
+	public void createBook(Book book) {
 		Connection connection = null;
 		
 		try {
 			connection = getConnection();
 			PreparedStatement statement = connection.prepareStatement(
-					"INSERT INTO `readers`(name, email) VALUES(?, ?);",	Statement.RETURN_GENERATED_KEYS);
-			statement.setString(1, reader.getName());
-			statement.setString(2, reader.getEmail());
-			statement.execute();
+					"INSERT INTO `books`(title, author, reader_id) VALUES(?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+			statement.setString(1, book.getTitle());
+			statement.setString(2, book.getAuthor());
+			statement.setInt(3, book.getReaderId());
+			statement.execute();			
 			ResultSet generatedKeys = statement.getGeneratedKeys();
 			
 			if(generatedKeys.next()) {
-				reader.setId(generatedKeys.getInt(1));
+				book.setId(generatedKeys.getInt(1));
 			}
 		} catch(SQLException e) {
 			LOGGER.error("ERROR ", e);
@@ -109,21 +109,24 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#selectById(int id)
+	 * @see com.example.springboot.DAO.BookDAO#selectById(int id)
 	 */
 	@Override
-	public Reader selectById(int id) {
+	public Book selectById(int id) {
 		Connection connection = null;
-		Reader reader = null;
+		Book book = new Book();
 		
 		try {
 			connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("SELECT * FROM `readers` WHERE id=?;");
+			PreparedStatement statement = connection.prepareStatement("SELECT * FROM `books` WHERE id=?;");
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 			
-			if(resultSet.next()) {
-				reader = new Reader(resultSet.getInt("id"), resultSet.getString("name"), resultSet.getString("email"));
+			while(resultSet.next()) {
+				book.setId(resultSet.getInt("id"));
+				book.setTitle(resultSet.getString("title"));
+				book.setAuthor(resultSet.getString("author"));
+				book.setReaderId(resultSet.getInt("reader_id"));
 			}
 		} catch(SQLException e) {
 			LOGGER.error("ERROR ", e);
@@ -131,22 +134,24 @@ public class ReaderDAOImpl implements ReaderDAO{
 			closeConnection(connection);
 		}
 		
-		return reader;
+		return book;
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#updateReader(Reader reader)
+	 * @see com.example.springboot.DAO.BookDAO#updateBook(Book book)
 	 */
 	@Override
-	public void updateReader(Reader reader) {
+	public void updateBook(Book book) {
 		Connection connection = null;
 		
 		try {
 			connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("UPDATE `readers` SET name=?, email=? WHERE id=?;");
-			statement.setString(1, reader.getName());
-			statement.setString(2, reader.getEmail());
-			statement.setInt(3, reader.getId());
+			PreparedStatement statement = connection.prepareStatement(
+					"UPDATE `books` SET title=?, author=?, reader_id=? WHERE id=?;");
+			statement.setString(1, book.getTitle());
+			statement.setString(2, book.getAuthor());
+			statement.setInt(3, book.getReaderId());
+			statement.setInt(4, book.getId());
 			statement.execute();
 		} catch(SQLException e) {
 			LOGGER.error("ERROR ", e);
@@ -156,15 +161,15 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#removeById(int id)
+	 * @see com.example.springboot.DAO.BookDAO#deleteBook(int id)
 	 */
 	@Override
-	public void deleteById(int id) {
+	public void deleteBook(int id) {
 		Connection connection = null;
 		
 		try {
 			connection = getConnection();
-			PreparedStatement statement = connection.prepareStatement("DELETE FROM `readers` WHERE id=?;");
+			PreparedStatement statement = connection.prepareStatement("DELETE FROM `books` WHERE id=?;");
 			statement.setInt(1, id);
 			statement.execute();
 		} catch(SQLException e) {
@@ -173,5 +178,4 @@ public class ReaderDAOImpl implements ReaderDAO{
 			closeConnection(connection);
 		}
 	}
-	
 }

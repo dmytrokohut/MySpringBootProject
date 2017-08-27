@@ -11,7 +11,7 @@ public class Reader {
 	private String email;
 	
 	/**
-	 * The default constructor for creation object, useful if necessary just create a object 
+	 * The default constructor for object creation, useful if necessary just create a object 
 	 * without attributes
 	 */
 	public Reader() {

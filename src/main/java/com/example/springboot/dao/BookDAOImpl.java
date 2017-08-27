@@ -1,4 +1,4 @@
-package com.example.springboot.DAO;
+package com.example.springboot.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -12,16 +12,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import com.example.springboot.Base.Book;
+import com.example.springboot.base.Book;
 import com.mysql.jdbc.Statement;
 
 /**
- * This class implement methods from BookDAO interface. Repository annotation more suitable to DAO than Component
+ * This class implement methods from BookDAO interface
  * @author Dmytro Kohut
- * @version 1.0
+ * @version 1.1
  */
 @Repository("bookDAO")
-public class BookDAOImpl implements BookDAO {
+public class BookDAOImpl implements DAOInterface<Book> {
 	
 	final static Logger LOGGER = Logger.getLogger(BookDAOImpl.class);
 	
@@ -55,10 +55,10 @@ public class BookDAOImpl implements BookDAO {
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO.BookDAO#findAllBooks()
+	 * @see com.example.springboot.dao.DAOInterface#findAllBooks()
 	 */
 	@Override
-	public Collection<Book> findAllBooks() {
+	public Collection<Book> findAll() {
 		Connection connection = null;
 		List<Book> resultList = new ArrayList<>();
 		
@@ -82,10 +82,10 @@ public class BookDAOImpl implements BookDAO {
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO.BookDAO#createBook(Book book)
+	 * @see com.example.springboot.dao.DAOInterface#createBook(T object)
 	 */
 	@Override
-	public void createBook(Book book) {
+	public void create(Book book) {
 		Connection connection = null;
 		
 		try {
@@ -109,10 +109,10 @@ public class BookDAOImpl implements BookDAO {
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO.BookDAO#selectById(int id)
+	 * @see com.example.springboot.dao.DAOInterface#selectById(int id)
 	 */
 	@Override
-	public Book selectById(int id) {
+	public Book selectById(Integer id) {
 		Connection connection = null;
 		Book book = new Book();
 		
@@ -138,10 +138,10 @@ public class BookDAOImpl implements BookDAO {
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO.BookDAO#updateBook(Book book)
+	 * @see com.example.springboot.dao.DAOInterface#updateBook(T object)
 	 */
 	@Override
-	public void updateBook(Book book) {
+	public void update(Book book) {
 		Connection connection = null;
 		
 		try {
@@ -161,10 +161,10 @@ public class BookDAOImpl implements BookDAO {
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO.BookDAO#deleteBook(int id)
+	 * @see com.example.springboot.dao.DAOInterface#deleteBook(int id)
 	 */
 	@Override
-	public void deleteBook(int id) {
+	public void delete(Integer id) {
 		Connection connection = null;
 		
 		try {

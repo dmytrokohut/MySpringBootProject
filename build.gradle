@@ -23,6 +23,7 @@ repositories {
 
 
 dependencies {
+	compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-web-services')
 	runtime('mysql:mysql-connector-java')

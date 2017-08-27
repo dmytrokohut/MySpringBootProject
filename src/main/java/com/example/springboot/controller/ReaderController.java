@@ -1,5 +1,6 @@
-package com.example.springboot.Controller;
+package com.example.springboot.controller;
 
+import java.io.IOException;
 import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,20 +10,25 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.springboot.Base.Reader;
-import com.example.springboot.DAO.ReaderDAO;
+import com.example.springboot.base.Reader;
+import com.example.springboot.dao.DAOInterface;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This is class that control work of application, process requests where URL start with '/reader'
  * @author Dmytro Kohut
- * @version 1.0
+ * @version 1.1
  */
 @RestController
 @RequestMapping("/reader")
 public class ReaderController {
 	
 	@Autowired
-	private ReaderDAO readerDAO;
+	private DAOInterface<Reader> readerDAO;
+	
+	static final private ObjectMapper objectMapper = new ObjectMapper();
 	
 	/**
 	 * Get information about all readers
@@ -30,7 +36,7 @@ public class ReaderController {
 	 */
 	@RequestMapping(value="/all", method=RequestMethod.GET)
 	public Collection<Reader> findAllReaders(){
-		return readerDAO.findAllReaders();
+		return readerDAO.findAll();
 	}
 	
 	/**
@@ -39,7 +45,7 @@ public class ReaderController {
 	 * @return
 	 */
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
-	public Reader selectById(@PathVariable("id") int id) {
+	public Reader selectById(@PathVariable("id") Integer id) {
 		return readerDAO.selectById(id);
 	}
 	
@@ -47,32 +53,38 @@ public class ReaderController {
 	 * Create a new reader in database
 	 * @param book
 	 * @return
+	 * @throws IOException 
+	 * @throws JsonProcessingException 
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public String createReader(@RequestBody Reader reader){
-		readerDAO.createReader(reader);
-		return "Reader - was created";
+	public JsonNode create(@RequestBody Reader reader) throws JsonProcessingException, IOException{
+		readerDAO.create(reader);
+		return objectMapper.readTree("{\"result\":\"Reader was created !\"}");
 	}
 	
 	/**
 	 * Update information about reader
 	 * @param book
 	 * @return
+	 * @throws IOException 
+	 * @throws JsonProcessingException 
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public String updateReader(@RequestBody Reader reader) {
-		readerDAO.updateReader(reader);
-		return "Reader with id=" + reader.getId() + " was updated";
+	public JsonNode update(@RequestBody Reader reader) throws JsonProcessingException, IOException {
+		readerDAO.update(reader);
+		return objectMapper.readTree("{\"result\":\"Reader was updated !\"}");
 	}
 	
 	/**
 	 * Delete reader from database
 	 * @param id
 	 * @return
+	 * @throws IOException 
+	 * @throws JsonProcessingException 
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public String deleteReader(@PathVariable("id") int id) {
-		readerDAO.deleteById(id);
-		return "Reader with id=" + id + " was removed from database";
+	public JsonNode delete(@PathVariable("id") int id) throws JsonProcessingException, IOException {
+		readerDAO.delete(id);
+		return objectMapper.readTree("{\"result\":\"Reader was deleted !\"}");
 	}
 }

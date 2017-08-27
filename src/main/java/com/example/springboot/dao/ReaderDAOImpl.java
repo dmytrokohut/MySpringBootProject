@@ -1,4 +1,4 @@
-package com.example.springboot.DAO;
+package com.example.springboot.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,15 +13,15 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
-import com.example.springboot.Base.Reader;
+import com.example.springboot.base.Reader;
 
 /**
- * This class implement methods from ReaderDAO interface. Repository annotation more suitable to DAO than Component
+ * This class implement methods from ReaderDAO interface
  * @author Dmytro Kohut
- * @version 1.0
+ * @version 1.1
  */
 @Repository("readerDAO")
-public class ReaderDAOImpl implements ReaderDAO{
+public class ReaderDAOImpl implements DAOInterface<Reader>{
 	
 	final static Logger LOGGER = Logger.getLogger(ReaderDAOImpl.class);
 	
@@ -56,10 +56,10 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#findAllReaders()
+	 * @see com.example.springboot.dao.DAOInterface#findAllReaders()
 	 */
 	@Override
-	public Collection<Reader> findAllReaders(){
+	public Collection<Reader> findAll(){
 		Connection connection = null;
 		List<Reader> resultList = new ArrayList<>();
 		
@@ -83,10 +83,10 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#createReader(Reader reader)
+	 * @see com.example.springboot.dao.DAOInterface#createReader(T object)
 	 */
 	@Override
-	public void createReader(Reader reader) {
+	public void create(Reader reader) {
 		Connection connection = null;
 		
 		try {
@@ -109,10 +109,10 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#selectById(int id)
+	 * @see com.example.springboot.dao.DAOInterface#selectById(int id)
 	 */
 	@Override
-	public Reader selectById(int id) {
+	public Reader selectById(Integer id) {
 		Connection connection = null;
 		Reader reader = null;
 		
@@ -135,10 +135,10 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#updateReader(Reader reader)
+	 * @see com.example.springboot.dao.DAOInterface#updateReader(T object)
 	 */
 	@Override
-	public void updateReader(Reader reader) {
+	public void update(Reader reader) {
 		Connection connection = null;
 		
 		try {
@@ -156,10 +156,10 @@ public class ReaderDAOImpl implements ReaderDAO{
 	}
 	
 	/**
-	 * @see com.example.springboot.DAO#removeById(int id)
+	 * @see com.example.springboot.dao#removeById(int id)
 	 */
 	@Override
-	public void deleteById(int id) {
+	public void delete(Integer id) {
 		Connection connection = null;
 		
 		try {

@@ -21,10 +21,12 @@ nbproject/private/
 build/
 nbbuild/
 dist/
-nbdist/
+nbdist/i
 .nb-gradle/
 
 ### Customer ###
 bin/
 /bin/
-.gitignore
+gradlew
+gradlew.bat
+.gitignore.swp

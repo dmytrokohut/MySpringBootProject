@@ -9,7 +9,7 @@ import com.example.springboot.common.Reader;
  * @author Kohut Dmytro
  * @version 1.0
  */
-public interface IBookDAOService {
+public interface IReaderDAOService {
 	
 	/**
 	 * This method return all readers from database

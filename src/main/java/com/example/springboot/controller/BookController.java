@@ -1,6 +1,8 @@
 package com.example.springboot.controller;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.springboot.common.Book;
-import com.example.springboot.common.StringResponse;
 import com.example.springboot.dao.IBookDAOService;
 
 /**
@@ -26,7 +27,9 @@ import com.example.springboot.dao.IBookDAOService;
 public class BookController {
 	
 	@Autowired
-	private IBookDAOService iBookDAOService;
+	private IBookDAOService iBookService;
+	
+	private Map<String, String> map = new HashMap<>();
 	
 	/**
 	 * Get information about all readers
@@ -34,7 +37,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/all", method=RequestMethod.GET)
 	public @ResponseBody ResponseEntity<Collection<Book>> findAll() {
-		return new ResponseEntity<Collection<Book>>(iBookDAOService.findAll(), HttpStatus.OK);
+		return new ResponseEntity<Collection<Book>>(iBookService.findAll(), HttpStatus.OK);
 	}
 	
 	/**
@@ -44,39 +47,42 @@ public class BookController {
 	 */
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
 	public @ResponseBody ResponseEntity<Book> selectById(@PathVariable("id") Integer id) {
-		return new ResponseEntity<Book>(iBookDAOService.selectById(id), HttpStatus.OK);
+		return new ResponseEntity<Book>(iBookService.selectById(id), HttpStatus.OK);
 	}
 	
 	/**
 	 * Create a new reader in database
 	 * @param book
-	 * @return ResponseEntity<StringResponse>
+	 * @return ResponseEntity<Map<String, String>>
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public @ResponseBody ResponseEntity<StringResponse> create(@RequestBody Book book) {
-		iBookDAOService.create(book);
-		return new ResponseEntity<StringResponse>(new StringResponse("Book was created !"), HttpStatus.OK);
+	public @ResponseBody ResponseEntity<Map<String, String>> create(@RequestBody Book book) {
+		iBookService.create(book);
+		map.put("response", "Book with id=" + book.getId() + " was created !");
+		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
 	}
 	
 	/**
 	 * Update information about book
 	 * @param book
-	 * @return ResponseEntity<StringResponse>
+	 * @return ResponseEntity<Map<String, String>>
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public @ResponseBody ResponseEntity<StringResponse> update(@RequestBody Book book) {
-		iBookDAOService.update(book);
-		return new ResponseEntity<StringResponse>(new StringResponse("Book was updated !"), HttpStatus.OK);
+	public @ResponseBody ResponseEntity<Map<String, String>> update(@RequestBody Book book) {
+		iBookService.update(book);
+		map.put("response", "Book with id=" + book.getId() + " was updated !");
+		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
 	}
 	
 	/**
 	 * Delete book from database
 	 * @param id
-	 * @return ResponseEntity<StringResponse>
+	 * @return ResponseEntity<Map<String, String>>
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<StringResponse> delete(@PathVariable Integer id) {
-		iBookDAOService.delete(id);
-		return new ResponseEntity<StringResponse>(new StringResponse("Book was deleter !"), HttpStatus.OK);
+	public @ResponseBody ResponseEntity<Map<String, String>> delete(@PathVariable Integer id) {
+		iBookService.delete(id);
+		map.put("response", "Book with id=" + id + " was deleted !");
+		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
 	}
 }

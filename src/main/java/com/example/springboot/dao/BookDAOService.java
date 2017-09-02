@@ -44,8 +44,8 @@ public class BookDAOService implements IBookDAOService {
 	public Collection<Book> findAll() {
 		List<Book> resultList = new ArrayList<>();
 		
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(SQLFindAll)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLFindAll);
 			ResultSet resultSet = statement.executeQuery();
 			
 			while(resultSet.next()) {
@@ -67,8 +67,8 @@ public class BookDAOService implements IBookDAOService {
 	public Book selectById(Integer id) {
 		Book book = new Book();
 		
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(SQLSelectById)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLSelectById);
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 			
@@ -91,9 +91,8 @@ public class BookDAOService implements IBookDAOService {
 	@Override
 	public void create(Book book) {
 		
-		try (Connection connection = getConnection(); 
-				PreparedStatement statement = connection.prepareStatement(SQLCreate, Statement.RETURN_GENERATED_KEYS)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLCreate, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, book.getTitle());
 			statement.setString(2, book.getAuthor());
 			statement.setInt(3, book.getReaderId());
@@ -115,8 +114,8 @@ public class BookDAOService implements IBookDAOService {
 	@Override
 	public void update(Book book) {
 		
-		try (Connection connection = getConnection(); PreparedStatement statement = connection.prepareStatement(SQLUpdate)){
-			
+		try (Connection connection = getConnection()){
+			PreparedStatement statement = connection.prepareStatement(SQLUpdate);
 			statement.setString(1, book.getTitle());
 			statement.setString(2, book.getAuthor());
 			statement.setInt(3, book.getReaderId());
@@ -134,9 +133,8 @@ public class BookDAOService implements IBookDAOService {
 	@Override
 	public void delete(Integer id) {
 		
-		try (Connection connection = getConnection();
-				PreparedStatement statement = connection.prepareStatement(SQLDelete)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLDelete);
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e) {

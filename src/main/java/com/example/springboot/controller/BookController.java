@@ -29,7 +29,7 @@ public class BookController {
 	@Autowired
 	private IBookDAOService iBookService;
 	
-	private Map<String, String> map = new HashMap<>();
+	private Map<String, Integer> map = new HashMap<>();
 	
 	/**
 	 * Get information about all readers
@@ -53,36 +53,36 @@ public class BookController {
 	/**
 	 * Create a new reader in database
 	 * @param book
-	 * @return ResponseEntity<Map<String, String>>
+	 * @return ResponseEntity<Map<String, Integer>>
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public @ResponseBody ResponseEntity<Map<String, String>> create(@RequestBody Book book) {
+	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
 		iBookService.create(book);
-		map.put("response", "Book with id=" + book.getId() + " was created !");
-		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
+		map.put("id", book.getId());
+		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
 	/**
 	 * Update information about book
 	 * @param book
-	 * @return ResponseEntity<Map<String, String>>
+	 * @return ResponseEntity<Map<String, Integer>>
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public @ResponseBody ResponseEntity<Map<String, String>> update(@RequestBody Book book) {
+	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
 		iBookService.update(book);
-		map.put("response", "Book with id=" + book.getId() + " was updated !");
-		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
+		map.put("id", book.getId());
+		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
 	/**
 	 * Delete book from database
 	 * @param id
-	 * @return ResponseEntity<Map<String, String>>
+	 * @return ResponseEntity<Map<String, Integer>>
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<Map<String, String>> delete(@PathVariable Integer id) {
+	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
 		iBookService.delete(id);
-		map.put("response", "Book with id=" + id + " was deleted !");
-		return new ResponseEntity<Map<String, String>>(map, HttpStatus.OK);
+		map.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 }

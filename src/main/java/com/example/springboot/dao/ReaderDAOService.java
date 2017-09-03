@@ -19,13 +19,23 @@ import com.example.springboot.common.Reader;
  * @author Kohut Dmytro
  * @version 1.0
  */
-@Repository("iReaderDAOService")
+@Repository("iReaderService")
 public class ReaderDAOService implements IReaderDAOService {	
 
-	private static final String URL = "jdbc:mysql://localhost:3306/libriary";
-	private static final String USERNAME= "root";
-	private static final String PASSWORD = "root";
-	private static String SQLQuery = "";
+	private static final String SQLfindAll = "SELECT id, name, email FROM `readers`;";
+	private static final String SQLSelectById = "SELECT id, name, email FROM `readers` WHERE id=?";
+	private static final String SQLCreate = "INSERT INTO `readers`(name, email) VALUES(?, ?);";
+	private static final String SQLUpdate = "UPDATE `readers` SET name=?, email=? WHERE id=?;";
+	private static final String SQLDelete = "DELETE FROM `readers` WHERE id=?;";
+	
+	/**
+	 * This method create and return a connection
+	 * @return Connection
+	 * @throws SQLException 
+	 */
+	private Connection getConnection() throws SQLException {
+		return DriverManager.getConnection("jdbc:mysql://localhost:3306/libriary", "root", "root");
+	}
 	
 	
 	/**
@@ -34,11 +44,9 @@ public class ReaderDAOService implements IReaderDAOService {
 	@Override
 	public Collection<Reader> findAll() {
 		List<Reader> resultList = new ArrayList<>();
-		SQLQuery = "SELECT id, name, email FROM `readers`;";
 		
-		try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-				PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLfindAll);
 			ResultSet resultSet = statement.executeQuery();
 			
 			while(resultSet.next()) {
@@ -58,11 +66,9 @@ public class ReaderDAOService implements IReaderDAOService {
 	@Override
 	public Reader selectById(Integer id) {
 		Reader reader = new Reader();
-		SQLQuery = "SELECT id, name, email FROM `readers` WHERE id=?;";
 		
-		try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-				PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLSelectById);
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 			
@@ -83,11 +89,9 @@ public class ReaderDAOService implements IReaderDAOService {
 	 */
 	@Override
 	public void create(Reader reader) {
-		SQLQuery = "INSERT INTO `readers`(name, email) VALUES(?, ?);";
 		
-		try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-				PreparedStatement statement = connection.prepareStatement(SQLQuery, Statement.RETURN_GENERATED_KEYS)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLCreate, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, reader.getName());
 			statement.setString(2, reader.getEmail());
 			statement.execute();
@@ -107,11 +111,9 @@ public class ReaderDAOService implements IReaderDAOService {
 	 */
 	@Override
 	public void update(Reader reader) {
-		SQLQuery = "UPDATE `readers` SET name=?, email=? WHERE id=?;";
 		
-		try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-				PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLUpdate);
 			statement.setString(1, reader.getName());
 			statement.setString(2, reader.getEmail());
 			statement.setInt(3, reader.getId());
@@ -127,11 +129,9 @@ public class ReaderDAOService implements IReaderDAOService {
 	 */
 	@Override
 	public void delete(Integer id) {
-		SQLQuery = "DELETE FROM `readers` WHERE id=?;";
 		
-		try (Connection connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-				PreparedStatement statement = connection.prepareStatement(SQLQuery)) {
-			
+		try (Connection connection = getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(SQLDelete);
 			statement.setInt(1, id);
 			statement.execute();
 		} catch (SQLException e) {

@@ -2,7 +2,7 @@ package com.example.springboot.dao;
 
 import java.util.Collection;
 
-import com.example.springboot.common.Book;
+import com.example.springboot.entity.Book;
 
 /**
  * This interface defines a methods for work with database table
@@ -27,18 +27,21 @@ public interface IBookDAOService {
 	/**
 	 * This method create a new instance of book in database
 	 * @param book
+	 * @return Integer
 	 */
-	void create(Book book);
+	Integer create(Book book);
 	
 	/**
 	 * This method update information of an existing book
 	 * @param book
+	 * @return Integer
 	 */
-	void update(Book book);
+	Integer update(Book book);
 	
 	/**
 	 * This method delete existing book in database by given id
 	 * @param id
+	 * @return Integer
 	 */
-	void delete(Integer id);
+	Integer delete(Integer id);
 }

@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.springboot.common.Book;
 import com.example.springboot.dao.IBookDAOService;
+import com.example.springboot.entity.Book;
 
 /**
  * This is class that control work of application, process requests where URL start with '/book'
@@ -57,8 +57,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
-		iBookService.create(book);
-		map.put("id", book.getId());
+		map.put("id", iBookService.create(book));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -69,8 +68,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
-		iBookService.update(book);
-		map.put("id", book.getId());
+		map.put("id", iBookService.update(book));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -81,8 +79,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
-		iBookService.delete(id);
-		map.put("id", id);
+		map.put("id", iBookService.delete(id));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 }

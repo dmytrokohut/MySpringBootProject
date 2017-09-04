@@ -1,4 +1,4 @@
-package com.example.springboot.common;
+package com.example.springboot.entity;
 
 /**
  * This is a basic class for book object.

@@ -1,7 +1,7 @@
 package com.example.springboot.controller;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ import com.example.springboot.entity.Book;
 public class BookController {
 	
 	@Autowired
-	private IBookDAOService iBookService;
+	private IBookDAOService bookDAOService;
 	
 	private Map<String, Integer> map = new HashMap<>();
 	
@@ -36,8 +36,8 @@ public class BookController {
 	 * @return ResponseEntity<Collection<Book>>
 	 */
 	@RequestMapping(value="/all", method=RequestMethod.GET)
-	public @ResponseBody ResponseEntity<Collection<Book>> findAll() {
-		return new ResponseEntity<Collection<Book>>(iBookService.findAll(), HttpStatus.OK);
+	public @ResponseBody ResponseEntity<List<Book>> findAll() {
+		return new ResponseEntity<List<Book>>(bookDAOService.findAll(), HttpStatus.OK);
 	}
 	
 	/**
@@ -47,7 +47,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
 	public @ResponseBody ResponseEntity<Book> selectById(@PathVariable("id") Integer id) {
-		return new ResponseEntity<Book>(iBookService.selectById(id), HttpStatus.OK);
+		return new ResponseEntity<Book>(bookDAOService.selectById(id), HttpStatus.OK);
 	}
 	
 	/**
@@ -57,7 +57,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
-		map.put("id", iBookService.create(book));
+		map.put("id", bookDAOService.create(book));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -68,7 +68,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
-		map.put("id", iBookService.update(book));
+		map.put("id", bookDAOService.update(book));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -79,7 +79,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
-		map.put("id", iBookService.delete(id));
+		map.put("id", bookDAOService.delete(id));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 }

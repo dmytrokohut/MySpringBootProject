@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -20,7 +19,7 @@ import com.mysql.jdbc.Statement;
  * @author Kohut Dmytro
  * @version 1.0
  */
-@Repository("iBookService")
+@Repository
 public class BookDAOService implements IBookDAOService {
 
 	private final Logger LOG = Logger.getLogger(BookDAOService.class);
@@ -45,7 +44,7 @@ public class BookDAOService implements IBookDAOService {
 	 * @return Collection<Book>
 	 */
 	@Override
-	public Collection<Book> findAll() {
+	public List<Book> findAll() {
 		List<Book> resultList = new ArrayList<>();
 		
 		try (Connection connection = getConnection()) {

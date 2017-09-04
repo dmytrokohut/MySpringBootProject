@@ -1,6 +1,6 @@
 package com.example.springboot.dao;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.example.springboot.entity.Book;
 
@@ -13,9 +13,9 @@ public interface IBookDAOService {
 
 	/**
 	 * This method return all books from database
-	 * @return Collection<Book>
+	 * @return List<Book>
 	 */
-	Collection<Book> findAll();
+	List<Book> findAll();
 	
 	/**
 	 * This method looking for a book in database by given id

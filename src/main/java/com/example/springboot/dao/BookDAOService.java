@@ -22,13 +22,18 @@ import com.mysql.jdbc.Statement;
 @Repository
 public class BookDAOService implements IBookDAOService {
 
-	private final Logger LOG = Logger.getLogger(BookDAOService.class);
+	private static final Logger LOGGER = Logger.getLogger(BookDAOService.class);
 	
-	private static final String SQL_FIND_ALL = "SELECT id, title, author, reader_id FROM `books`;";
-	private static final String SQL_SELECT_BY_ID = "SELECT id, title, author, reader_id FROM `books` WHERE id=?;";
-	private static final String SQL_CREATE = "INSERT INTO `books`(title, author, reader_id) VALUES(?, ?, ?);";
-	private static final String SQL_UPDATE = "UPDATE `books` SET title=?, author=?, reader_id=? WHERE id=?;";
-	private static final String SQL_DELETE = "DELETE FROM `books` WHERE id=?;";
+	private static final String QUERY_FIND_ALL = "SELECT id, title, author, reader_id FROM `books`;";
+	private static final String QUERY_SELECT_BY_ID = "SELECT id, title, author, reader_id FROM `books` WHERE id=?;";
+	private static final String QUERY_CREATE = "INSERT INTO `books`(title, author, reader_id) VALUES(?, ?, ?);";
+	private static final String QUERY_UPDATE = "UPDATE `books` SET title=?, author=?, reader_id=? WHERE id=?;";
+	private static final String QUERY_DELETE = "DELETE FROM `books` WHERE id=?;";
+	
+	private static final String ID = "id";
+	private static final String TITLE = "title";
+	private static final String AUTHOR = "author";
+	private static final String READER_ID = "reader_id";
 	
 	/**
 	 * This method create and return a connection
@@ -40,27 +45,37 @@ public class BookDAOService implements IBookDAOService {
 	}
 	
 	/**
+	 * This method create new instance of Book and return it
+	 * @return Book
+	 * @throws SQLException 
+	 */
+	private Book getBook(ResultSet resultSet) throws SQLException {
+		return new Book(resultSet.getInt(ID), resultSet.getString(TITLE), resultSet.getString(AUTHOR), resultSet.getInt(READER_ID));
+	}
+	
+	/**
 	 * This method return all books from database
-	 * @return Collection<Book>
+	 * @return List<Book>
 	 */
 	@Override
 	public List<Book> findAll() {
 		List<Book> resultList = new ArrayList<>();
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQL_FIND_ALL);
+			PreparedStatement statement = connection.prepareStatement(QUERY_FIND_ALL);
 			ResultSet resultSet = statement.executeQuery();
 			
 			while(resultSet.next()) {
-				Book book = new Book(resultSet.getInt("id"), resultSet.getString("title"),
-						resultSet.getString("author"), resultSet.getInt("reader_id"));
-				resultList.add(book);
+				resultList.add(getBook(resultSet));
 			}
-		} catch(SQLException e) {
-			LOG.error(e.getMessage());
+			
+			return resultList;
+			
+		} catch(SQLException | RuntimeException e) {
+			LOGGER.error(e.getMessage());
 		}
 		
-		return resultList;
+		return null;
 	}
 	
 	/**
@@ -70,24 +85,22 @@ public class BookDAOService implements IBookDAOService {
 	 */
 	@Override
 	public Book selectById(Integer id) {
-		Book book = new Book();
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQL_SELECT_BY_ID);
+			PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_ID);
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 			
-			if(resultSet.next()) {
-				book.setId(resultSet.getInt("id"));
-				book.setTitle(resultSet.getString("title"));
-				book.setAuthor(resultSet.getString("author"));
-				book.setReaderId(resultSet.getInt("reader_id"));
-			}
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
+			resultSet.next();
+			Book book = getBook(resultSet);
+			
+			return book;
+			
+		} catch (SQLException | RuntimeException e) {
+			LOGGER.error(e.getMessage());
 		}
 		
-		return book;
+		return null;
 	}
 	
 	/**
@@ -99,21 +112,22 @@ public class BookDAOService implements IBookDAOService {
 	public Integer create(Book book) {
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQL_CREATE, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement statement = connection.prepareStatement(QUERY_CREATE, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, book.getTitle());
 			statement.setString(2, book.getAuthor());
 			statement.setInt(3, book.getReaderId());
 			statement.execute();
 			ResultSet generatedKeys = statement.getGeneratedKeys();
 			
-			if(generatedKeys.next()) {
-				book.setId(generatedKeys.getInt(1));
-			}
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
+			generatedKeys.next();
+			
+			return generatedKeys.getInt(1);
+			
+		} catch (SQLException | RuntimeException e) {
+			LOGGER.error(e.getMessage());
 		}
 		
-		return book.getId();
+		return null;
 	}
 	
 	/**
@@ -125,17 +139,20 @@ public class BookDAOService implements IBookDAOService {
 	public Integer update(Book book) {
 		
 		try (Connection connection = getConnection()){
-			PreparedStatement statement = connection.prepareStatement(SQL_UPDATE);
+			PreparedStatement statement = connection.prepareStatement(QUERY_UPDATE);
 			statement.setString(1, book.getTitle());
 			statement.setString(2, book.getAuthor());
 			statement.setInt(3, book.getReaderId());
 			statement.setInt(4, book.getId());
 			statement.execute();
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
+			
+			return book.getId();
+			
+		} catch (SQLException | RuntimeException e) {
+			LOGGER.error(e.getMessage());
 		}
 		
-		return book.getId();
+		return null;
 	}
 	
 	/**
@@ -147,14 +164,17 @@ public class BookDAOService implements IBookDAOService {
 	public Integer delete(Integer id) {
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQL_DELETE);
+			PreparedStatement statement = connection.prepareStatement(QUERY_DELETE);
 			statement.setInt(1, id);
 			statement.execute();
-		} catch (SQLException e) {
-			LOG.error(e.getMessage());
+			
+			return id;
+			
+		} catch (SQLException | RuntimeException e) {
+			LOGGER.error(e.getMessage());
 		}
 		
-		return id;
+		return null;
 	}
 	
 	

@@ -11,15 +11,7 @@ public class Book {
 	private String title;
 	private String author;
 	private Integer readerId;
-	
-	/**
-	 * The default constructor for object creation, useful if necessary just create an object 
-	 * without filling of attributes
-	 */
-	public Book() {
-		// default constructor
-	}
-	
+			
 	/**
 	 * This constructor useful if necessary to create an object and sets values of attributes
 	 * @param id

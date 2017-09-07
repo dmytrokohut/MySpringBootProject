@@ -11,6 +11,13 @@ public class Book {
 	private String title;
 	private String author;
 	private Integer readerId;
+	
+	/**
+	 * This constructor necessary for '@RequestBody'
+	 */
+	public Book() {
+		// default constructor
+	}
 			
 	/**
 	 * This constructor useful if necessary to create an object and sets values of attributes

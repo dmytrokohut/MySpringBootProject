@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Repository;
 
 import com.example.springboot.entity.Book;
@@ -20,8 +22,13 @@ import com.mysql.jdbc.Statement;
  * @version 1.0
  */
 @Repository
+@ComponentScan
 public class BookDAOService implements IBookDAOService {
-
+	
+	@Value("${jdbc.url}") private String URL;
+	@Value("${jdbc.username}") private String USERNAME;  
+	@Value("${jdbc.password}") private String PASSWORD;
+	
 	private static final Logger LOGGER = Logger.getLogger(BookDAOService.class);
 	
 	private static final String QUERY_FIND_ALL = "SELECT id, title, author, reader_id FROM `books`;";
@@ -41,7 +48,7 @@ public class BookDAOService implements IBookDAOService {
 	 * @throws SQLException 
 	 */
 	private Connection getConnection() throws SQLException {
-		return DriverManager.getConnection("jdbc:mysql://localhost:3306/libriary", "root", "root");
+		return DriverManager.getConnection(URL, USERNAME, PASSWORD);
 	}
 	
 	/**

@@ -29,15 +29,20 @@ public class BookController {
 	@Autowired
 	private IBookDAOService bookDAOService;
 	
-	private Map<String, Integer> map = new HashMap<>();
+	private Map<String, Integer> mapToResponse = new HashMap<>();
 	
 	/**
 	 * Get information about all readers
-	 * @return ResponseEntity<Collection<Book>>
+	 * @return ResponseEntity<List<Book>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/all", method=RequestMethod.GET)
-	public @ResponseBody ResponseEntity<List<Book>> findAll() {
-		return new ResponseEntity<List<Book>>(bookDAOService.findAll(), HttpStatus.OK);
+	public ResponseEntity<List<Book>> findAll() {
+		List<Book> list = bookDAOService.findAll();
+		if(list.isEmpty())
+			return new ResponseEntity<List<Book>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<List<Book>>(list, HttpStatus.OK);
 	}
 	
 	/**
@@ -45,9 +50,14 @@ public class BookController {
 	 * @param id
 	 * @return ResponseEntity<Book>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
-	public @ResponseBody ResponseEntity<Book> selectById(@PathVariable("id") Integer id) {
-		return new ResponseEntity<Book>(bookDAOService.selectById(id), HttpStatus.OK);
+	public ResponseEntity<Book> selectById(@PathVariable("id") Integer id) {
+		Book book = bookDAOService.selectById(id);
+		if(book == null)
+			return new ResponseEntity<Book>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<Book>(book, HttpStatus.OK);
 	}
 	
 	/**
@@ -55,10 +65,15 @@ public class BookController {
 	 * @param book
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
-		map.put("id", bookDAOService.create(book));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
+		Integer id = bookDAOService.create(book);
+		if(id == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 	
 	/**
@@ -66,10 +81,15 @@ public class BookController {
 	 * @param book
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
-		map.put("id", bookDAOService.update(book));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
+		Integer id = bookDAOService.update(book);
+		if(id == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.OK);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 	
 	/**
@@ -77,9 +97,13 @@ public class BookController {
 	 * @param id
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
-		map.put("id", bookDAOService.delete(id));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
+		if(bookDAOService.delete(id) == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 }

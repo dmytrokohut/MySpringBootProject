@@ -7,9 +7,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -20,12 +20,14 @@ import com.example.springboot.common.Reader;
  * @author Kohut Dmytro
  * @version 1.0
  */
-@Repository("iReaderService")
+@Repository
 public class ReaderDAOService implements IReaderDAOService {
 	
 	@Value("${jdbc.url}") private String URL;
 	@Value("${jdbc.username}") private String USERNAME;
 	@Value("${jdbc.password}") private String PASSWORD;
+	
+	private static final Logger LOGGER = Logger.getLogger(ReaderDAOService.class);
 
 	private static final String QUERY_FIND_ALL = "SELECT id, name, email FROM `readers`;";
 	private static final String QUERY_SELECT_BY_ID = "SELECT id, name, email FROM `readers` WHERE id=?";
@@ -58,10 +60,10 @@ public class ReaderDAOService implements IReaderDAOService {
 	
 	/**
 	 * This method return all readers from database
-	 * @return Collection<Reader>
+	 * @return List<Reader>
 	 */
 	@Override
-	public Collection<Reader> findAll() {	
+	public List<Reader> findAll() {	
 		
 		try (Connection connection = getConnection()) {
 			PreparedStatement statement = connection.prepareStatement(QUERY_FIND_ALL);
@@ -76,7 +78,7 @@ public class ReaderDAOService implements IReaderDAOService {
 			return resultList;
 			
 		} catch (SQLException | RuntimeException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		
 		return null;
@@ -102,7 +104,7 @@ public class ReaderDAOService implements IReaderDAOService {
 			return reader;
 			
 		} catch (SQLException | RuntimeException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		
 		return null;
@@ -128,7 +130,7 @@ public class ReaderDAOService implements IReaderDAOService {
 			return generatedKeys.getInt(1); 
 			
 		} catch (SQLException | RuntimeException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		
 		return null;		
@@ -152,7 +154,7 @@ public class ReaderDAOService implements IReaderDAOService {
 			return reader.getId();
 					
 		} catch (SQLException | RuntimeException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		
 		return null;
@@ -174,7 +176,7 @@ public class ReaderDAOService implements IReaderDAOService {
 			return id;
 			
 		} catch (SQLException | RuntimeException e) {
-			e.printStackTrace();
+			LOGGER.error(e.getMessage());
 		}
 		
 		return null;

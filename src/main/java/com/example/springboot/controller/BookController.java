@@ -1,7 +1,7 @@
 package com.example.springboot.controller;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +27,22 @@ import com.example.springboot.dao.IReaderDAOService;
 public class BookController {
 	
 	@Autowired
-	private IReaderDAOService iReaderService;
+	private IReaderDAOService readerDAOService;
 	
-	private Map<String, Integer> map = new HashMap<>();
+	private Map<String, Integer> mapToResponse = new HashMap<>();
 	
 	/**
 	 * Get information about all readers
-	 * @return ResponseEntity<Collection<Reader>>
+	 * @return ResponseEntity<List<Reader>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/all", method=RequestMethod.GET)
-	public @ResponseBody ResponseEntity<Collection<Reader>> findAll() {
-		return new ResponseEntity<Collection<Reader>>(iReaderService.findAll(), HttpStatus.OK);
+	public ResponseEntity<List<Reader>> findAll() {
+		List<Reader> resultList = readerDAOService.findAll();
+		if(resultList.isEmpty())
+			return new ResponseEntity<List<Reader>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<List<Reader>>(resultList, HttpStatus.OK);
 	}
 	
 	/**
@@ -45,9 +50,14 @@ public class BookController {
 	 * @param id
 	 * @return ResponseEntity<Reader>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/select/{id}", method=RequestMethod.GET)
-	public @ResponseBody ResponseEntity<Reader> selectById(@PathVariable("id") Integer id) {
-		return new ResponseEntity<Reader>(iReaderService.selectById(id), HttpStatus.OK);
+	public ResponseEntity<Reader> selectById(@PathVariable("id") Integer id) {
+		Reader reader = readerDAOService.selectById(id);
+		if(reader == null)
+			return new ResponseEntity<Reader>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		return new ResponseEntity<Reader>(reader, HttpStatus.OK);
 	}
 	
 	/**
@@ -55,10 +65,15 @@ public class BookController {
 	 * @param reader
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Reader reader) {
-		map.put("id", iReaderService.create(reader));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> create(@RequestBody Reader reader) {
+		Integer id = readerDAOService.create(reader);
+		if(id == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 	
 	/**
@@ -66,10 +81,15 @@ public class BookController {
 	 * @param reader
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Reader reader) {
-		map.put("id", iReaderService.update(reader));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> update(@RequestBody Reader reader) {
+		Integer id = readerDAOService.update(reader);
+		if(id == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 	
 	/**
@@ -77,10 +97,14 @@ public class BookController {
 	 * @param id
 	 * @return ResponseEntity<Map<String, Integer>>
 	 */
+	@ResponseBody
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable("id") Integer id) {
-		map.put("id", iReaderService.delete(id));
-		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
+	public ResponseEntity<Map<String, Integer>> delete(@PathVariable("id") Integer id) {
+		if(readerDAOService.delete(id) == null)
+			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+		
+		mapToResponse.put("id", id);
+		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
 	}
 
 }

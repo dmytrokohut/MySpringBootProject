@@ -1,6 +1,6 @@
 package com.example.springboot.dao;
 
-import java.util.Collection;
+import java.util.List;
 
 import com.example.springboot.common.Reader;
 
@@ -13,9 +13,9 @@ public interface IReaderDAOService {
 	
 	/**
 	 * This method return all readers from database
-	 * @return Collection<Reader>
+	 * @return List<Reader>
 	 */
-	Collection<Reader> findAll();
+	List<Reader> findAll();
 	
 	/**
 	 * This method looking for a reader in database by given id

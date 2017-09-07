@@ -28,3 +28,4 @@ nbdist/
 bin/
 /bin/
 .gitignore
+.gitignore.swp

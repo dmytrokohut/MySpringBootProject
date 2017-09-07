@@ -57,8 +57,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/create", method=RequestMethod.POST)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> create(@RequestBody Reader reader) {
-		iReaderService.create(reader);
-		map.put("id", reader.getId());
+		map.put("id", iReaderService.create(reader));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -69,8 +68,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> update(@RequestBody Reader reader) {
-		iReaderService.update(reader);
-		map.put("id", reader.getId());
+		map.put("id", iReaderService.update(reader));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 	
@@ -81,8 +79,7 @@ public class BookController {
 	 */
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
 	public @ResponseBody ResponseEntity<Map<String, Integer>> delete(@PathVariable("id") Integer id) {
-		iReaderService.delete(id);
-		map.put("id", id);
+		map.put("id", iReaderService.delete(id));
 		return new ResponseEntity<Map<String, Integer>>(map, HttpStatus.OK);
 	}
 

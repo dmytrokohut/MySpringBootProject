@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
 import com.example.springboot.common.Reader;
@@ -20,13 +21,21 @@ import com.example.springboot.common.Reader;
  * @version 1.0
  */
 @Repository("iReaderService")
-public class ReaderDAOService implements IReaderDAOService {	
+public class ReaderDAOService implements IReaderDAOService {
+	
+	@Value("${jdbc.url}") private String URL;
+	@Value("${jdbc.username}") private String USERNAME;
+	@Value("${jdbc.password}") private String PASSWORD;
 
-	private static final String SQLfindAll = "SELECT id, name, email FROM `readers`;";
-	private static final String SQLSelectById = "SELECT id, name, email FROM `readers` WHERE id=?";
-	private static final String SQLCreate = "INSERT INTO `readers`(name, email) VALUES(?, ?);";
-	private static final String SQLUpdate = "UPDATE `readers` SET name=?, email=? WHERE id=?;";
-	private static final String SQLDelete = "DELETE FROM `readers` WHERE id=?;";
+	private static final String QUERY_FIND_ALL = "SELECT id, name, email FROM `readers`;";
+	private static final String QUERY_SELECT_BY_ID = "SELECT id, name, email FROM `readers` WHERE id=?";
+	private static final String QUERY_INSERT = "INSERT INTO `readers`(name, email) VALUES(?, ?);";
+	private static final String QUERY_UPDATE = "UPDATE `readers` SET name=?, email=? WHERE id=?;";
+	private static final String QUERY_DELETE = "DELETE FROM `readers` WHERE id=?;";
+	
+	private static final String ID = "id";
+	private static final String NAME = "name";
+	private static final String EMAIL = "email";
 	
 	/**
 	 * This method create and return a connection
@@ -34,110 +43,141 @@ public class ReaderDAOService implements IReaderDAOService {
 	 * @throws SQLException 
 	 */
 	private Connection getConnection() throws SQLException {
-		return DriverManager.getConnection("jdbc:mysql://localhost:3306/libriary", "root", "root");
+		return DriverManager.getConnection(URL, USERNAME, PASSWORD);
+	}
+	
+	/**
+	 * This method create instance of Reader and return it
+	 * @return Reader
+	 * @throws SQLException 
+	 */
+	private Reader getReader(ResultSet resultSet) throws SQLException {
+		return new Reader(resultSet.getInt(ID), resultSet.getString(NAME), resultSet.getString(EMAIL));
 	}
 	
 	
 	/**
-	 * @see com.example.springboot.dao.IReaderDAOService#findAll()
+	 * This method return all readers from database
+	 * @return Collection<Reader>
 	 */
 	@Override
-	public Collection<Reader> findAll() {
-		List<Reader> resultList = new ArrayList<>();
+	public Collection<Reader> findAll() {	
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQLfindAll);
+			PreparedStatement statement = connection.prepareStatement(QUERY_FIND_ALL);
 			ResultSet resultSet = statement.executeQuery();
 			
+			List<Reader> resultList = new ArrayList<>();
+			
 			while(resultSet.next()) {
-				Reader reader = new Reader(resultSet.getInt("id"), resultSet.getString("name"), resultSet.getString("email"));
-				resultList.add(reader);
+				resultList.add(getReader(resultSet));
 			}
-		} catch (SQLException e) {
+			
+			return resultList;
+			
+		} catch (SQLException | RuntimeException e) {
 			e.printStackTrace();
 		}
 		
-		return resultList;
+		return null;
 	}
 
 	/**
-	 * @see com.example.springboot.dao.IReaderDAOService#selectById(Integer id)
+	 * This method looking for a reader in database by given id
+	 * @param id
+	 * @return Reader
 	 */
 	@Override
 	public Reader selectById(Integer id) {
-		Reader reader = new Reader();
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQLSelectById);
+			PreparedStatement statement = connection.prepareStatement(QUERY_SELECT_BY_ID);
 			statement.setInt(1, id);
 			ResultSet resultSet = statement.executeQuery();
 			
-			if(resultSet.next()) {
-				reader.setId(resultSet.getInt("id"));
-				reader.setName(resultSet.getString("name"));
-				reader.setEmail(resultSet.getString("email"));
-			}
-		} catch (SQLException e) {
+			resultSet.next();
+			
+			Reader reader = getReader(resultSet);
+			
+			return reader;
+			
+		} catch (SQLException | RuntimeException e) {
 			e.printStackTrace();
 		}
 		
-		return reader;
+		return null;
 	}
 
 	/**
-	 * @see com.example.springboot.dao.IReaderDAOService#create(Reader reader)
+	 * This method create a new instance of reader in database
+	 * @param reader
+	 * @return Integer
 	 */
 	@Override
-	public void create(Reader reader) {
+	public Integer create(Reader reader) {
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQLCreate, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement statement = connection.prepareStatement(QUERY_INSERT, Statement.RETURN_GENERATED_KEYS);
 			statement.setString(1, reader.getName());
 			statement.setString(2, reader.getEmail());
 			statement.execute();
 			ResultSet generatedKeys = statement.getGeneratedKeys();
 			
-			if(generatedKeys.next()) {
-				reader.setId(generatedKeys.getInt(1));
-			}
-		} catch (SQLException e) {
+			generatedKeys.next();
+			
+			return generatedKeys.getInt(1); 
+			
+		} catch (SQLException | RuntimeException e) {
 			e.printStackTrace();
 		}
 		
+		return null;		
 	}
 
 	/**
-	 * @see com.example.springboot.dao.IReaderDAOService#update(Reader reader)
+	 * This method update information of an existing reader
+	 * @param reader 
+	 * @return Integer
 	 */
 	@Override
-	public void update(Reader reader) {
+	public Integer update(Reader reader) {
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQLUpdate);
+			PreparedStatement statement = connection.prepareStatement(QUERY_UPDATE);
 			statement.setString(1, reader.getName());
 			statement.setString(2, reader.getEmail());
 			statement.setInt(3, reader.getId());
 			statement.execute();
-		} catch (SQLException e) {
+			
+			return reader.getId();
+					
+		} catch (SQLException | RuntimeException e) {
 			e.printStackTrace();
 		}
 		
+		return null;
 	}
 
 	/**
-	 * @see com.example.springboot.dao.IReaderDAOService#delete(Integer id)
+	 * This method delete existing reader in database by given id
+	 * @param id
+	 * @return Integer
 	 */
 	@Override
-	public void delete(Integer id) {
+	public Integer delete(Integer id) {
 		
 		try (Connection connection = getConnection()) {
-			PreparedStatement statement = connection.prepareStatement(SQLDelete);
+			PreparedStatement statement = connection.prepareStatement(QUERY_DELETE);
 			statement.setInt(1, id);
 			statement.execute();
-		} catch (SQLException e) {
+			
+			return id;
+			
+		} catch (SQLException | RuntimeException e) {
 			e.printStackTrace();
 		}
 		
+		return null;
 	}
 
 }

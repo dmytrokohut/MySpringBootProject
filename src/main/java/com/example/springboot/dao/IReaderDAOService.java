@@ -27,18 +27,21 @@ public interface IReaderDAOService {
 	/**
 	 * This method create a new instance of reader in database
 	 * @param reader
+	 * @return Integer
 	 */
-	void create(Reader reader);
+	Integer create(Reader reader);
 	
 	/**
 	 * This method update information of an existing reader
 	 * @param reader 
+	 * @return Integer
 	 */
-	void update(Reader reader);
+	Integer update(Reader reader);
 	
 	/**
 	 * This method delete existing reader in database by given id
 	 * @param id
+	 * @return Integer
 	 */
-	void delete(Integer id);
+	Integer delete(Integer id);
 }

@@ -12,8 +12,7 @@ public class Reader {
 	private String email;
 	
 	/**
-	 * The default constructor for object creation, useful if necessary just create an object 
-	 * without filling of attributes
+	 * This constructor needed for "@RequestBody"
 	 */
 	public Reader() {
 		// default constructor

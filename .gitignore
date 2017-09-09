@@ -27,4 +27,3 @@ nbdist/
 ### Customer ###
 bin/
 .gitignore
-/bin/

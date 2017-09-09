@@ -29,8 +29,6 @@ public class BookController {
 	@Autowired
 	private IBookDAOService bookDAOService;
 	
-	private Map<String, Integer> mapToResponse = new HashMap<>();
-	
 	/**
 	 * Get information about all readers
 	 * @return ResponseEntity<List<Book>>
@@ -63,33 +61,31 @@ public class BookController {
 	/**
 	 * Create a new reader in database
 	 * @param book
-	 * @return ResponseEntity<Map<String, Integer>>
+	 * @return ResponseEntity<Book>
 	 */
 	@ResponseBody
 	@RequestMapping(value="/create", method=RequestMethod.POST)
-	public ResponseEntity<Map<String, Integer>> create(@RequestBody Book book) {
+	public ResponseEntity<Book> create(@RequestBody Book book) {
 		Integer id = bookDAOService.create(book);
 		if(id == null)
-			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Book>(HttpStatus.INTERNAL_SERVER_ERROR);
 		
-		mapToResponse.put("id", id);
-		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
+		book.setId(id);
+		return new ResponseEntity<Book>(book, HttpStatus.OK);
 	}
 	
 	/**
 	 * Update information about book
 	 * @param book
-	 * @return ResponseEntity<Map<String, Integer>>
+	 * @return ResponseEntity<Book>
 	 */
 	@ResponseBody
 	@RequestMapping(value="/update", method=RequestMethod.PUT)
-	public ResponseEntity<Map<String, Integer>> update(@RequestBody Book book) {
-		Integer id = bookDAOService.update(book);
-		if(id == null)
-			return new ResponseEntity<Map<String, Integer>>(HttpStatus.OK);
+	public ResponseEntity<Book> update(@RequestBody Book book) {
+		if(bookDAOService.update(book) == null)
+			return new ResponseEntity<Book>(HttpStatus.INTERNAL_SERVER_ERROR);
 		
-		mapToResponse.put("id", id);
-		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
+		return new ResponseEntity<Book>(book, HttpStatus.OK);
 	}
 	
 	/**
@@ -99,11 +95,14 @@ public class BookController {
 	 */
 	@ResponseBody
 	@RequestMapping(value="/delete/{id}", method=RequestMethod.DELETE)
-	public ResponseEntity<Map<String, Integer>> delete(@PathVariable Integer id) {
+	public ResponseEntity<Map<String, Object>> delete(@PathVariable Integer id) {
+		Map<String, Object> mapToResponse = new HashMap<>();
+		
 		if(bookDAOService.delete(id) == null)
-			return new ResponseEntity<Map<String, Integer>>(HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<Map<String, Object>>(HttpStatus.INTERNAL_SERVER_ERROR);
 		
 		mapToResponse.put("id", id);
-		return new ResponseEntity<Map<String, Integer>>(mapToResponse, HttpStatus.OK);
+		mapToResponse.put("response", "deleted");
+		return new ResponseEntity<Map<String, Object>>(mapToResponse, HttpStatus.OK);
 	}
 }

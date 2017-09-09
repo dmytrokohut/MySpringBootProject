@@ -26,6 +26,10 @@ nbdist/
 
 ### Customer ###
 bin/
+<<<<<<< HEAD
 .gitignore
 /bin/
 .gitignore.swp
+=======
+.gitignore
+>>>>>>> c408047a501ec8de9ea8fb9c93d84d9797a39a9f
